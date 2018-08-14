@@ -1,0 +1,43 @@
+{
+  "name": "evileye",
+  "version": "0.0.1",
+  "description": "Node.js framework for event sourced web backend with GraphQL interface.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "NODE_ENV=test node_modules/.bin/mocha test/**/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alfreddatakillen/evileye.git"
+  },
+  "author": "Alfred Godoy <alfred@nurd.nu>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alfreddatakillen/evileye/issues"
+  },
+  "homepage": "https://github.com/alfreddatakillen/evileye#readme",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^5.2.0",
+    "supertest": "^3.1.0",
+    "testdouble": "^3.8.1"
+  },
+  "dependencies": {
+    "disposablefile": "^1.1.0",
+    "envcnf": "^1.0.1",
+    "express": "^4.16.3",
+    "express-graphql": "^0.6.12",
+    "get-port": "^4.0.0",
+    "graphiql-sessionist": "^0.1.0",
+    "graphql": "^0.13.2",
+    "graphql-tools": "^3.1.1",
+    "lagan": "0.0.2",
+    "request": "^2.88.0",
+    "sessionistheader": "^0.1.14",
+    "winston": "^3.0.0",
+    "winston-transport": "^4.2.0"
+  }
+}
