@@ -108,7 +108,7 @@ class Server {
 	
 		app.use('/graphql', this.graphql.middleware);
 	
-		const graphiqlDir = this.configuration.basedir + '/node_modules/evileye/node_modules/graphiql-sessionist/build';
+		const graphiqlDir = this.configuration.basedir + '/node_modules/graphiql-sessionist/build';
 		app.use('/graphiql', express.static(graphiqlDir));
 
 		return new Promise((resolve, reject) => resolve())
