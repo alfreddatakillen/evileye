@@ -6,57 +6,58 @@ const Server = require('./server');
 
 class EvilEye {
 
-    constructor(opts) {
+    constructor(opts = {}) {
 
-        if (typeof opts === 'object') {
-            this.opts = opts;
-        } else {
-            this.opts = {};
-        }
+        this._opts = opts;
 
-        this.configuration = new Configuration({
+        this._configuration = new Configuration({
             consoleLogLevel: opts.consoleLogLevel,
             port: opts.port
         });
         
-        this.lagan = new Lagan({
+        this._lagan = new Lagan({
             initialState: opts.initialState || {},
-            logFile: this.configuration.eventLogFile
+            logFile: this._configuration.eventLogFile
         });
+        this.Event = this._lagan.Event;
 
-        this.log = new Log({
-            configuration: this.configuration
+        this._log = new Log({
+            configuration: this._configuration
         })
 
-		this.graphql = new GraphQL({
-            configuration: this.configuration,
-            lagan: this.lagan,
-            log: this.log
+		this._graphql = new GraphQL({
+            configuration: this._configuration,
+            lagan: this._lagan,
+            log: this._log
         });
 
-        this.server = new Server({
-            configuration: this.configuration,
-            graphql: this.graphql,
-            log: this.log
+        this._server = new Server({
+            configuration: this._configuration,
+            graphql: this._graphql,
+            log: this._log
         })
 
 
-        this.lagan.on('successfulProjection', ({ type, props, position }) => {
-            this.log.silly(log.messages.eventProjected, { eventType: type, props, position });
+        this._lagan.on('successfulProjection', ({ type, props, position }) => {
+            this._log.silly(this._log.messages.eventProjected, { eventType: type, props, position });
         });
         
-        this.lagan.on('failedProjection', ({ type, props, err }) => {
-            this.log.debug(log.messages.eventProjectionFailed, { eventType: type, props, error: err.message });  
+        this._lagan.on('failedProjection', ({ type, props, err }) => {
+            this._log.debug(this._log.messages.eventProjectionFailed, { eventType: type, props, error: err.message });  
         });
 
     }
 
-    listen() {
-        return this.server.listen();
+    createCommand(...args) {
+        return this._graphql.createCommand(...args);
+    }
+
+    listen(...args) {
+        return this._server.listen();
     }
 
     get state() {
-        return this.lagan.state;
+        return this._lagan.state;
     }
 
 }

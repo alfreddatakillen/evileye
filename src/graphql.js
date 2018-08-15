@@ -55,18 +55,7 @@ class GraphQL {
                 }
             `
         ];
-        
-        const schema = makeExecutableSchema({
-            typeDefs: this._typeDefs,
-            resolvers: this._resolvers
-        });
-        
-        this.middleware = expressGraphql({
-            schema,
-            rootValue: {},
-            graphiql: false
-        })
-        
+
     }
 
     addTypeDefs(defs) {
@@ -81,19 +70,32 @@ class GraphQL {
     }
     
     createCommand(commandName, EventClass) {
-        try {
+        //try {
             this.lagan.registerEvent(EventClass);        
-        } catch (err) {
+        //} catch (err) {
             // ...
-        }
+        //}
+        this.log.debug('New command created.', { commandName, eventName: new EventClass({}).type });
         const commandFn = function(props) {
             return new (EventClass)(props).apply();
         }
         const fields = EventClass.propsDefinition();
-        const typeDef = 'extend type Command {\n' + Object.keys(fields).map(key => '  ' + key + ': ' + fields[key]).join('\n') + '}';
+        const typeDef = 'extend type Command {\n' + commandName + '(' + Object.keys(fields).map(key => '  ' + key + ': ' + fields[key]).join('\n') + '): Boolean}';
+        this.log.silly('New graphql definition.', { typeDef: typeDef });
         this.addTypeDefs([ typeDef ]);
         this.addResolver('Command', commandName, (obj, props, context, info) => commandFn(props));
         return commandFn;
+    }
+
+    middleware() {      
+        return expressGraphql({
+            schema: makeExecutableSchema({
+                typeDefs: this._typeDefs,
+                resolvers: this._resolvers
+            }),
+            rootValue: {},
+            graphiql: false
+        })
     }
 
 }

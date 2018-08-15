@@ -106,7 +106,7 @@ class Server {
 			}
 		});
 	
-		app.use('/graphql', this.graphql.middleware);
+		app.use('/graphql', this.graphql.middleware());
 	
 		const graphiqlDir = this.configuration.basedir + '/node_modules/graphiql-sessionist/build';
 		app.use('/graphiql', express.static(graphiqlDir));
