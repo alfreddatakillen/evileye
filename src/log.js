@@ -35,7 +35,7 @@ class Log {
 			new winston.transports.File({ filename: configuration.logFile, format: winston.format.combine(winston.format.timestamp(), winston.format.json()) })
 		];
 		if (configuration.stage !== 'test') {
-			transports.push(new winston.transports.Console({ format: winston.format.simple(), timestamp: true }))
+			transports.push(new winston.transports.Console({ format: winston.format.simple(), level: configuration.consoleLogLevel, timestamp: true }))
 			if (!configuration.slackWebhook) {
 				setImmediate(() => this.warn(messages.noSlackWebhookConfig));
 			} else {

@@ -15,11 +15,12 @@ class EvilEye {
         }
 
         this.configuration = new Configuration({
+            consoleLogLevel: opts.consoleLogLevel,
             port: opts.port
         });
         
         this.lagan = new Lagan({
-            initialState: {},
+            initialState: opts.initialState || {},
             logFile: this.configuration.eventLogFile
         });
 
@@ -51,7 +52,11 @@ class EvilEye {
     }
 
     listen() {
-        this.server.listen();
+        return this.server.listen();
+    }
+
+    get state() {
+        return this.lagan.state;
     }
 
 }

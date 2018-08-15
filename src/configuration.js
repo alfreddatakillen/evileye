@@ -20,6 +20,7 @@ class Configuration {
         }
         
         const logLevel = opts.logLevel || envcnf.get('LOG_LEVEL') || 'silly';
+        const consoleLogLevel = opts.consoleLogLevel || envcnf.get('CONSOLE_LOG_LEVEL') || logLevel;
         const logFile = basedir + '/' + name + '_' + stage + '.log';
         const port = envcnf.get('PORT') || stage === 'production' ? 80 : null;
         
@@ -30,6 +31,7 @@ class Configuration {
         // Expose those:
 
         this.basedir = basedir;
+        this.consoleLogLevel = consoleLogLevel;
         this.eventLogFile = eventLogFile;
         this.logFile = logFile;
         this.logLevel = logLevel;
