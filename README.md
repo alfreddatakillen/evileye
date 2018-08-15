@@ -21,8 +21,7 @@ Get started!
 Install it (`npm install eviley`) and use it:
 
 ```
-const EvilEye = require('evileye');
-const evilEye = new EvilEye();
+const evilEye = require('evileye');
 evilEye.listen({});
 ```
 
