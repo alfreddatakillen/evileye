@@ -54,6 +54,38 @@ class EvilEye {
             this._log.info(this._log.messages.eventProjectionFailed, { eventType: type, props, error: error.message, position });  
         });
 
+        // Make private properties private using Proxy:
+
+        return new Proxy(this, {
+            get(target, propKey) {
+
+                // Hide private props:
+                if (typeof propKey === 'string' && propKey.substr(0, 1) === '_') {
+                    return undefined;
+                }
+
+                // Fix the scope for function calls.
+                // (Without it, `this` will point to the proxy object, not the target object, when functions run.)
+                if (typeof target[propKey] === 'function') {
+                    return (...args) => { return target[propKey](...args); };
+                }
+
+                return target[propKey];
+
+            },
+            ownKeys(target) {
+                // Hide private props:
+                return Object.keys(target).filter(key => key.substr(0, 1) !== '_');
+            }
+        });
+
+    }
+
+    close() {
+        console.log(typeof this.close);
+        console.log(typeof this._server);
+        this._server.close();
+        this._lagan.close();
     }
 
     addTypeDefs(...args) {
