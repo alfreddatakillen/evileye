@@ -23,6 +23,7 @@ class Server {
 	}
 
 	close() {
+		if (this.server === null) return;
 		this.server.close(() => {
 			// Log something?
 		});
