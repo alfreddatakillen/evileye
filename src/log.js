@@ -8,6 +8,8 @@ const winston = require('winston');
 const messages = {
 	configuration: 'EvilEye configuration.',
 	eventProjected: 'Event was projected.',
+	eventPostValidationFailed: 'Event validation failed. (Pre validation - before event was written to event stream.)',
+	eventPreValidationFailed: 'Event validation failed. (Post validation - after event was written to event stream.)',
 	eventProjectionFailed: 'Event projection failed.',
 	incomingHttpRequest: 'Incoming HTTP(S) request.',
 	invalidAuthorizationHeader: 'Invalid Sessionist authorization header.',

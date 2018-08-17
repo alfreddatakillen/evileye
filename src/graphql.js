@@ -69,25 +69,48 @@ class GraphQL {
         this._resolvers[type][field] = fn;
     }
     
-    createCommand(commandName, EventClass) {
-        //try {
-            this.lagan.registerEvent(EventClass);        
-        //} catch (err) {
-            // ...
-        //}
+    createCommand(commandName, EventClass, response) {
+        this.lagan.registerEvent(EventClass); // TODO: Check for dupes. RegisterEvent might throw an error here..
         this.log.debug('New command created.', { commandName, eventName: new EventClass({}).type });
-        const commandFn = function(props) {
-            return new (EventClass)(props).apply();
+        const commandFn = function(props, { obj, context, info }) {
+            return new (EventClass)(props).apply()
+                .then(({ state, position }) => {
+                    if (typeof response === 'function') {
+                        return response(props, { obj, context, info, state, position })
+                    }
+                    return true;
+                });
         }
         const fields = EventClass.propsDefinition();
-        const typeDef = 'extend type Command {\n' + commandName + '(' + Object.keys(fields).map(key => '  ' + key + ': ' + fields[key]).join('\n') + '): Boolean}';
+        const returnType = (response && response._evileye && response._evileye.graphQlReturnType) || 'Boolean';
+        const typeDefArgs = fields.length === 0 ? '' : '(' + Object.keys(fields).map(key => '  ' + key + ': ' + fields[key]).join('\n') + ')';
+        const typeDef = 'extend type Command {\n' + commandName + ' ' + typeDefArgs + ': ' + returnType + '}';
         this.log.silly('New graphql definition.', { typeDef: typeDef });
         this.addTypeDefs([ typeDef ]);
-        this.addResolver('Command', commandName, (obj, props, context, info) => commandFn(props));
+        this.addResolver('Command', commandName, (obj, props, context, info) => commandFn(props, { obj, context, info }));
         return commandFn;
     }
 
-    middleware() {      
+    createQuery(queryName, propsDefinition, queryFn, returnType) {
+        const resolverFn = function(props, { obj, context, info, state, position }) {
+            return queryFn(props, {
+                obj,
+                context,
+                info,
+                state: typeof state !== 'undefined' ? state : this.state,
+                position
+            });
+        }
+        resolverFn._evileye = { graphQlReturnType: returnType };
+        const typeDefArgs = propsDefinition.length === 0 ? '' : '(' + Object.keys(propsDefinition).map(key => '  ' + key + ': ' + propsDefinition[key]).join('\n') + ')';
+        const typeDef = 'extend type Query {\n' + queryName + ' ' + typeDefArgs + ': ' + returnType + '}';
+        this.log.silly('New graphql definition.', { typeDef: typeDef });
+        this.addTypeDefs([ typeDef ]);
+        this.addResolver('Query', queryName, (obj, props, context, info) => resolverFn(props));
+        return resolverFn;
+    }
+
+    middleware() {
         return expressGraphql({
             schema: makeExecutableSchema({
                 typeDefs: this._typeDefs,
