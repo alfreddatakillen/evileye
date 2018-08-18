@@ -65,8 +65,9 @@ class EvilEye {
                 }
 
                 // Fix the scope for function calls.
-                // (Without it, `this` will point to the proxy object, not the target object, when functions run.)
-                if (typeof target[propKey] === 'function') {
+                // Without it, `this` will point to the proxy object, not the target object, when functions run.
+                // Don't fix for properties with upper case first letter, since that's probably a class name.
+                if (typeof target[propKey] === 'function' && !propKey.substr(0, 1).match(/[A-Z]/)) {
                     return (...args) => { return target[propKey](...args); };
                 }
 
