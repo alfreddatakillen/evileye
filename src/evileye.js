@@ -83,8 +83,6 @@ class EvilEye {
     }
 
     close() {
-        console.log(typeof this.close);
-        console.log(typeof this._server);
         this._server.close();
         this._lagan.close();
     }
