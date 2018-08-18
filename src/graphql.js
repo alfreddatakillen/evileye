@@ -74,7 +74,7 @@ class GraphQL {
         this.log.debug('New command created.', { commandName, eventName: new EventClass({}).type });
         const commandFn = function(props, { obj, context, info }) {
             return new (EventClass)(props).apply()
-                .then(({ state, position }) => {
+                .then(({ state, position, props }) => {
                     if (typeof response === 'function') {
                         return response(props, { obj, context, info, state, position })
                     }
@@ -83,7 +83,7 @@ class GraphQL {
         }
         const fields = EventClass.propsDefinition();
         const returnType = (response && response._evileye && response._evileye.graphQlReturnType) || 'Boolean';
-        const typeDefArgs = fields.length === 0 ? '' : '(' + Object.keys(fields).map(key => '  ' + key + ': ' + fields[key]).join('\n') + ')';
+        const typeDefArgs = Object.keys(fields).length === 0 ? '' : '(' + Object.keys(fields).map(key => '  ' + key + ': ' + fields[key]).join('\n') + ')';
         const typeDef = 'extend type Command {\n' + commandName + ' ' + typeDefArgs + ': ' + returnType + '}';
         this.log.silly('New graphql definition.', { typeDef: typeDef });
         this.addTypeDefs([ typeDef ]);
@@ -102,7 +102,7 @@ class GraphQL {
             });
         }
         resolverFn._evileye = { graphQlReturnType: returnType };
-        const typeDefArgs = propsDefinition.length === 0 ? '' : '(' + Object.keys(propsDefinition).map(key => '  ' + key + ': ' + propsDefinition[key]).join('\n') + ')';
+        const typeDefArgs = Object.keys(propsDefinition).length === 0 ? '' : '(' + Object.keys(propsDefinition).map(key => '  ' + key + ': ' + propsDefinition[key]).join('\n') + ')';
         const typeDef = 'extend type Query {\n' + queryName + ' ' + typeDefArgs + ': ' + returnType + '}';
         this.log.silly('New graphql definition.', { typeDef: typeDef });
         this.addTypeDefs([ typeDef ]);

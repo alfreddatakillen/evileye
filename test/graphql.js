@@ -13,7 +13,7 @@ describe('GraphQL', () => {
             beforeEach(() => evilEye = new EvilEye());
             afterEach(() => evilEye.close());
 
-            it('should resolve data from query', () => {
+            it('should resolve data from the query', () => {
 
                 class UserAdded extends evilEye.Event {
                     static propsDefinition() {
@@ -30,7 +30,7 @@ describe('GraphQL', () => {
 
                 const getLastUser = evilEye.createQuery(
                     'getLastUser',
-                    [],
+                    {},
                     ({ username }, { obj, context, info, state }) => {
                         const nrOfUsers = (state.users && state.users.length) || 0;
                         if (!nrOfUsers) throw new Error('No users in db.');
@@ -62,6 +62,60 @@ describe('GraphQL', () => {
                     });
 
             });
+
+            it('can pass on new arguments to the query', () => {
+
+                class UserAdded extends evilEye.Event {
+                    static propsDefinition() {
+                        return {
+                            'username': 'String!'
+                        };
+                    }
+                    validate() {}
+                    project({ state }) {
+                        const id = Math.floor(Math.random() * 1000000000);
+                        const newState = { ...state, users: [ ...(state.users || []), { id, username: this.props.username } ]};
+                        this.props.id = id; // Just as the other props, this will be passed on as argument to the query resolver.
+                        return newState;
+                    }
+                }
+
+                const getUserById = evilEye.createQuery(
+                    'getUserById',
+                    { 'id': 'ID!' },
+                    ({ id }, { obj, context, info, state }) => {
+                        const users = (state.users || []).filter(user => user.id === id);
+                        if (users.length === 0) throw new Error('No such user.');
+                        return users[0];
+                    },
+                    'User'
+                );
+
+                evilEye.addTypeDefs([
+                    `
+                        type User {
+                            id: ID!
+                            username: String!
+                        }
+                    `
+                ]);
+
+                const addUser = evilEye.createCommand('addUser', UserAdded, getUserById);
+
+                return evilEye.listen()
+                    .then(port => {
+                        const request = supertest('http://localhost:' + port);
+                        return request
+                            .post('/graphql')
+                                .send('{ "query": "mutation { addUser(username:\\"alfred\\") { id username } }" }')
+                                .then(res => {
+                                    expect(res.body.data.addUser.id).to.match(/^[0-9]+$/);
+                                    expect(res.body.data.addUser.username).to.equal('alfred');
+                                });
+                    });
+
+            });
+
 
         });
 
