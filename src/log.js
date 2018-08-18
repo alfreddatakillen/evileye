@@ -11,6 +11,7 @@ const messages = {
 	eventPostValidationFailed: 'Event validation failed. (Pre validation - before event was written to event stream.)',
 	eventPreValidationFailed: 'Event validation failed. (Post validation - after event was written to event stream.)',
 	eventProjectionFailed: 'Event projection failed.',
+	graphqlError: 'Error caught during GraphQL resolve.',
 	incomingHttpRequest: 'Incoming HTTP(S) request.',
 	invalidAuthorizationHeader: 'Invalid Sessionist authorization header.',
 	listenOnPort: 'Started listening on port.',

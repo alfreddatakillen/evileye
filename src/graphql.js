@@ -2,6 +2,7 @@ const configuration = require('./configuration');
 const error = require('./error');
 const expressGraphql = require('express-graphql');
 const { makeExecutableSchema } = require('graphql-tools');
+const { formatError } = require('graphql/error');
 
 class GraphQL {
 
@@ -106,19 +107,29 @@ class GraphQL {
         const typeDef = 'extend type Query {\n' + queryName + ' ' + typeDefArgs + ': ' + returnType + '}';
         this.log.silly('New graphql definition.', { typeDef: typeDef });
         this.addTypeDefs([ typeDef ]);
-        this.addResolver('Query', queryName, (obj, props, context, info) => resolverFn(props));
+        this.addResolver('Query', queryName, (obj, props, context, info) => resolverFn(props, { obj, context, info, state: this.lagan.state, position: this.lagan.position }));
         return resolverFn;
     }
 
     middleware() {
-        return expressGraphql({
+        const options = {
             schema: makeExecutableSchema({
                 typeDefs: this._typeDefs,
                 resolvers: this._resolvers
             }),
             rootValue: {},
-            graphiql: false
-        })
+            graphiql: false,
+            formatError: error => {
+                this.log.verbose(this.log.messages.graphqlError, {
+                    errorMessage: error.message,
+                    locations: error.locations,
+                    stack: error.stack ? error.stack.split('\n') : [],
+                    path: error.path
+                  });
+                return formatError(error);
+            }
+        };
+        return expressGraphql(options);
     }
 
 }
