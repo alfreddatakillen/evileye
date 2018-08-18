@@ -22,7 +22,7 @@ Install it (`npm install eviley`) and use it:
 
 ```
 const evilEye = require('evileye');
-evilEye.listen({});
+evilEye.listen();
 ```
 
 
