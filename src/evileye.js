@@ -40,7 +40,6 @@ class EvilEye {
             log: this._log,
             lagan: this._lagan,
             auth: ({ keyId, state }) => {
-                console.log('!!! WTF');
                 if (this._authFns.length === 0) throw error.NoAuthFnRegistered();
                 if (this._authFns.length === 1) return this._authFns[0]({ keyId, state });
                 return new Promise((resolve, reject) => {
