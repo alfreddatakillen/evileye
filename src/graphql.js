@@ -22,7 +22,7 @@ class GraphQL {
             Query: {
                 serverName: () => this.configuration.name,
                 serverVersion: () => this.configuration.version,
-                whoAmI: (obj, {}, context, info) => context.user
+                mySessionKeyId: (obj, {}, context, info) => context.sessionKeyId
             }
         };
         
@@ -52,7 +52,7 @@ class GraphQL {
                 type Query {
                     serverName: String!
                     serverVersion: String!
-                    whoAmI: String!
+                    mySessionKeyId: String!
                 }
             `
         ];

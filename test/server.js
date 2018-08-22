@@ -75,10 +75,10 @@ describe('Server', () => {
                     .then(() => {
                         return request(server.app)
                             .post('/graphql')
-                            .send('{ "query": "query { whoAmI }" }')
+                            .send('{ "query": "query { mySessionKeyId }" }')
                             .expect(200)
                             .then(res => {
-                                expect(res.body).to.deep.equal({ data: { whoAmI: '' } });
+                                expect(res.body).to.deep.equal({ data: { mySessionKeyId: '' } });
                             });
                     });
     
@@ -101,8 +101,8 @@ describe('Server', () => {
                 lagan = new Lagan();
                 const log = new Log({ configuration });
                 const graphql = new GraphQL({ configuration, lagan, log });
-                const auth = ({ user }) => {
-                    if (user === 'johndoe') return 'topsecret';
+                const auth = ({ keyId }) => {
+                    if (keyId === 'johndoe') return 'topsecret';
                     throw new Error('No such user.');
                 };
                 server = new Server({ auth, configuration, graphql, lagan, log });
@@ -111,7 +111,7 @@ describe('Server', () => {
                 const secretKey = 'wrong secret key';
                 const url = '/graphql';
                 const method = 'POST';
-                const body = '{ "query": "query { whoAmI }" }';
+                const body = '{ "query": "query { mySessionKeyId }" }';
                 const date = new Date().toISOString();
 
                 return server.listen()
@@ -126,7 +126,7 @@ describe('Server', () => {
                             .send(body)
                             .expect(200)
                             .then(res => {
-                                expect(res.body).to.deep.equal({ data: { whoAmI: '' } });
+                                expect(res.body).to.deep.equal({ data: { mySessionKeyId: '' } });
                             });
                     });
     
@@ -150,8 +150,8 @@ describe('Server', () => {
                 lagan = new Lagan();
                 const log = new Log({ configuration });
                 const graphql = new GraphQL({ configuration, lagan, log });
-                const auth = ({ user }) => {
-                    if (user === 'johndoe') return 'topsecret';
+                const auth = ({ keyId }) => {
+                    if (keyId === 'johndoe') return 'topsecret';
                     throw new Error('No such user.');
                 };
                 server = new Server({ auth, configuration, graphql, lagan, log });
@@ -160,7 +160,7 @@ describe('Server', () => {
                 const secretKey = 'topsecret';
                 const url = '/graphql';
                 const method = 'POST';
-                const body = '{ "query": "query { whoAmI }" }';
+                const body = '{ "query": "query { mySessionKeyId }" }';
                 const date = new Date().toISOString();
 
                 return server.listen()
@@ -175,7 +175,7 @@ describe('Server', () => {
                             .send(body)
                             .expect(200)
                             .then(res => {
-                                expect(res.body).to.deep.equal({ data: { whoAmI: keyId } });
+                                expect(res.body).to.deep.equal({ data: { mySessionKeyId: keyId } });
                             });
                     });
     

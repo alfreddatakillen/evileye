@@ -57,7 +57,7 @@ class Server {
 			const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			const reqId = req.headers['x-request-id'] || uuid();
 			req.reqId = reqId;
-			req.user = '';
+			req.sessionKeyId = '';
 	
 			if (typeof req.headers['authorization'] === 'undefined' || typeof this.auth !== 'function') {
 				this.log && this.log.debug(this.log.messages.incomingHttpRequest, { ip, reqId, method: req.method, url: req.url, headers: req.headers });
@@ -72,7 +72,7 @@ class Server {
 					(keyId, callback) => {
 						let response;
 						try {
-							response = this.auth({ user: keyId, state: this.lagan.state });
+							response = this.auth({ keyId, state: this.lagan.state });
 						} catch (err) {
 							return callback(err);
 						}
@@ -95,8 +95,8 @@ class Server {
 							.catch(err => callback(err));
 					}
 				).then(keyId => {
-					req.user = keyId;
-					this.log && this.log.debug(this.log.messages.incomingHttpRequest, { ip, reqId, method: req.method, url: req.url, sessionKeyId: req.user });
+					req.sessionKeyId = keyId;
+					this.log && this.log.debug(this.log.messages.incomingHttpRequest, { ip, reqId, method: req.method, url: req.url, sessionKeyId: keyId });
 					next();
 				})
 				.catch(err => {

@@ -1,4 +1,5 @@
 const Configuration = require('./configuration');
+const error = require('./error');
 const GraphQL = require('./graphql');
 const Lagan = require('lagan');
 const Log = require('./log');
@@ -7,6 +8,8 @@ const Server = require('./server');
 class EvilEye {
 
     constructor(opts = {}) {
+
+        this._authFns = [];
 
         this._opts = opts;
 
@@ -34,8 +37,29 @@ class EvilEye {
         this._server = new Server({
             configuration: this._configuration,
             graphql: this._graphql,
-            log: this._log
-        })
+            log: this._log,
+            lagan: this._lagan,
+            auth: ({ keyId, state }) => {
+                console.log('!!! WTF');
+                if (this._authFns.length === 0) throw error.NoAuthFnRegistered();
+                if (this._authFns.length === 1) return this._authFns[0]({ keyId, state });
+                return new Promise((resolve, reject) => {
+                    let failCounter = 0;
+                    const authFns = [ ...(this._authFns) ];
+                    authFns.forEach(authFn => {
+                        return new Promise((resolve, reject) => resolve())
+                            .then(() => authFn({ keyId, state }))
+                            .then(secretKey => resolve(secretKey))
+                            .catch(err => {
+                                failCounter++;
+                                if (failCounter === authFns.length) {
+                                    reject(new error.AllAuthFnsFailed())
+                                }
+                            });
+                    });
+                });
+            }
+        });
 
         this._lagan.on('successfulProjection', ({ type, props, position, state }) => {
             this._log.info(this._log.messages.eventProjected, { eventType: type, props, position });
@@ -106,6 +130,13 @@ class EvilEye {
 
     listen(...args) {
         return this._server.listen();
+    }
+
+    registerAuthFn(fn) {
+        if (typeof fn !== 'function') {
+            throw new error.AuthFnIsNotAFunction();
+        }
+        this._authFns = [ ...(this._authFns), fn ];
     }
 
     get state() {
