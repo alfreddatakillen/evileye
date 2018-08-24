@@ -74,7 +74,7 @@ class GraphQL {
         this.lagan.registerEvent(EventClass); // TODO: Check for dupes. RegisterEvent might throw an error here..
         this.log.debug('New command created.', { commandName, eventName: new EventClass({}).type });
         const commandFn = function(props, { obj, context, info }) {
-            return new (EventClass)(props).apply()
+            return new (EventClass)(props).apply(context)
                 .then(({ state, position, props }) => {
                     if (typeof response === 'function') {
                         return response(props, { obj, context, info, state, position })
