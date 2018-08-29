@@ -120,7 +120,7 @@ class GraphQL {
             rootValue: {},
             graphiql: false,
             formatError: error => {
-                this.log.verbose(this.log.messages.graphqlError, {
+                this.log.error(this.log.messages.graphqlError, {
                     errorMessage: error.message,
                     locations: error.locations,
                     stack: error.stack ? error.stack.split('\n') : [],
