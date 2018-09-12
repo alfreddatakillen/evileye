@@ -1,4 +1,5 @@
 const envcnf = require('envcnf');
+const path = require('path');
 
 class Configuration {
 
@@ -27,6 +28,8 @@ class Configuration {
         const eventLogFile = basedir + '/' + name + '_' + stage + '.eventstream';
         
         const slackWebhook = opts.slackWebhook || envcnf.get('SLACK_WEBHOOK_URL') || '';
+
+        const staticHtdocsDir = envcnf.get('STATIC_HTDOCS_DIR') || null;
         
         // Expose those:
 
@@ -39,6 +42,7 @@ class Configuration {
         this.port = port;
         this.slackWebhook = slackWebhook;
         this.stage = stage;
+        this.staticHtdocsDir = staticHtdocsDir !== null ? path.resolve(staticHtdocsDir) : null;
         this.version = version;
     }
 

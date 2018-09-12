@@ -112,6 +112,11 @@ class Server {
 		const graphiqlDir = this.configuration.basedir + '/node_modules/graphiql-sessionist/build';
 		app.use('/graphiql', express.static(graphiqlDir));
 
+		if (this.configuration.staticHtdocsDir) {
+			this.log && this.log.verbose('!!! Static dir', { dir: this.configuration.staticHtdocsDir });
+			app.use('/', express.static(this.configuration.staticHtdocsDir));
+		}
+
 		return new Promise((resolve, reject) => resolve())
 			.then(() => {
 				const port = this.configuration.port;
