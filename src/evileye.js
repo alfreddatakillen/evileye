@@ -28,7 +28,7 @@ class EvilEye {
             configuration: this._configuration
         })
 
-		this._graphql = new GraphQL({
+	this._graphql = new GraphQL({
             configuration: this._configuration,
             lagan: this._lagan,
             log: this._log
@@ -110,6 +110,10 @@ class EvilEye {
         this._lagan.close();
     }
 
+    get command() {
+        return this._graphql.command;
+    }
+
     addTypeDefs(...args) {
         return this._graphql.addTypeDefs(...args);
     }
@@ -136,6 +140,10 @@ class EvilEye {
             throw new error.AuthFnIsNotAFunction();
         }
         this._authFns = [ ...(this._authFns), fn ];
+    }
+
+    get query() {
+        return this._graphql.query;
     }
 
     get state() {

@@ -14,6 +14,9 @@ class GraphQL {
         this.configuration = opts.configuration;
         this.lagan = opts.lagan;
         this.log = opts.log;
+
+        this.command = [];
+        this.query = [];
     
         this._resolvers = {
             Command: {
@@ -94,6 +97,7 @@ class GraphQL {
         this.log.silly('New graphql definition.', { typeDef: typeDef });
         this.addTypeDefs([ typeDef ]);
         this.addResolver('Command', commandName, (obj, props, context, info) => commandFn(props, { obj, context, info }));
+        this.command[commandName] = commandFn;
         return commandFn;
     }
 
@@ -113,6 +117,7 @@ class GraphQL {
         this.log.silly('New graphql definition.', { typeDef: typeDef });
         this.addTypeDefs([ typeDef ]);
         this.addResolver('Query', queryName, (obj, props, context, info) => resolverFn(props, { obj, context, info, state: this.lagan.state, position: this.lagan.position }));
+        this.query[queryName] = resolverFn;
         return resolverFn;
     }
 
