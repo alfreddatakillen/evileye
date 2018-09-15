@@ -20,6 +20,7 @@ class Server {
 		this.lagan = opts.lagan;
 		this.log = opts.log;
 		this.server = null;
+		this.staticHtdocsDir = null;
 	}
 
 	close() {
@@ -112,9 +113,8 @@ class Server {
 		const graphiqlDir = this.configuration.basedir + '/node_modules/graphiql-sessionist/build';
 		app.use('/graphiql', express.static(graphiqlDir));
 
-		if (this.configuration.staticHtdocsDir) {
-			this.log && this.log.verbose('!!! Static dir', { dir: this.configuration.staticHtdocsDir });
-			app.use('/', express.static(this.configuration.staticHtdocsDir));
+		if (this.staticHtdocsDir) {
+			app.use('/', express.static(this.staticHtdocsDir));
 		}
 
 		return new Promise((resolve, reject) => resolve())

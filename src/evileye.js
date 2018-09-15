@@ -142,6 +142,10 @@ class EvilEye {
         this._authFns = [ ...(this._authFns), fn ];
     }
 
+    staticHtdocs(directory) {
+        this._server.staticHtdocsDir = directory;
+    }
+
     get query() {
         return this._graphql.query;
     }
