@@ -114,6 +114,10 @@ class EvilEye {
         return this._graphql.command;
     }
 
+    addResolver(...args) {
+        return this._graphql.addResolver(...args);
+    }
+
     addTypeDefs(...args) {
         return this._graphql.addTypeDefs(...args);
     }
