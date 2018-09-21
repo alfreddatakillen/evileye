@@ -77,6 +77,14 @@ class EvilEye {
             this._log.verbose(this._log.messages.eventProjectionFailed, { eventType: type, props, error: error.message, position });  
         });
 
+        // If using temporary/disposable event log, then allow restarts:
+        
+        if (!this._configuration.eventLogFile) {
+            this.restart = () => {
+                return this._lagan.restart();
+            };
+        }
+
         // Make private properties private using Proxy:
 
         return new Proxy(this, {
@@ -105,11 +113,6 @@ class EvilEye {
 
     }
 
-    close() {
-        this._server.close();
-        this._lagan.close();
-    }
-
     get command() {
         return this._graphql.command;
     }
@@ -123,8 +126,12 @@ class EvilEye {
     }
 
     close() {
-        this._lagan.close();
+        this.closeEventStream();
         this._server.close();
+    }
+
+    closeEventStream() {
+        this._lagan.close();
     }
 
     createCommand(...args) {
