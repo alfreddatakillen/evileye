@@ -28,7 +28,12 @@ function given(precondition) {
 							firstResolve();
 							return promise
 								.catch(err => {
-									throw new Error('Error occured in preconditions.');
+
+									const newErr = new Error('Error occured in preconditions.');
+									newErr.original = err;
+									newErr.stack = newErr.stack.split('\n').slice(0, 2).join('\n') + '\n' + err.stack;
+									throw newErr;
+
 								});
 						})
 						.then(behaviourFn)
