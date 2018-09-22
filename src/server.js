@@ -23,6 +23,32 @@ class Server {
 		this.staticHtdocsDir = null;
 	}
 
+	authFn(keyId, callback) {
+		let response;
+		try {
+			response = this.auth({ keyId, state: this.lagan.state });
+		} catch (err) {
+			return callback(err);
+		}
+		
+		if (typeof response === 'string') {
+			return callback(null, response);
+		}
+
+		if (typeof response !== 'object' || typeof response.then !== 'function') {
+			return callback(new Error('auth function must return a string or a promise'));
+		}
+
+		response
+			.then(secretKey => {
+				if (typeof secretKey !== 'string') {
+					return callback(new Error('auth promise must resolve a string for the secret key'));
+				}
+				callback(null, secretKey);
+			})
+			.catch(err => callback(err));
+	}
+
 	close() {
 		if (this.server === null) return;
 		this.server.close(() => {
@@ -70,31 +96,7 @@ class Server {
 					req.url,
 					req.rawBody,
 					req.headers['date'] || req.headers['x-date'],
-					(keyId, callback) => {
-						let response;
-						try {
-							response = this.auth({ keyId, state: this.lagan.state });
-						} catch (err) {
-							return callback(err);
-						}
-						
-						if (typeof response === 'string') {
-							return callback(null, response);
-						}
-	
-						if (typeof response !== 'object' || typeof response.then !== 'function') {
-							return callback(new Error('auth function must return a string or a promise'));
-						}
-	
-						response
-							.then(secretKey => {
-								if (typeof secretKey !== 'string') {
-									return callback(new Error('auth promise must resolve a string for the secret key'));
-								}
-								callback(null, secretKey);
-							})
-							.catch(err => callback(err));
-					}
+					(keyId, callback) => this.authFn(keyId, callback)
 				).then(keyId => {
 					req.sessionKeyId = keyId;
 					this.log && this.log.debug(this.log.messages.incomingHttpRequest, { ip, reqId, method: req.method, url: req.url, sessionKeyId: keyId });

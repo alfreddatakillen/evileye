@@ -106,15 +106,44 @@ class GraphQL {
     }
 
     createQuery(queryName, propsDefinition, queryFn, returnType) {
-        const resolverFn = function(props, { obj, context, info, state, position }) {
+        const resolverFn = (props, scope) => {
+            let obj, context, info, state, position;
+            if (scope && scope.obj) obj = scope.obj;
+            if (scope && scope.context) context = scope.context;
+            if (scope && scope.info) info = scope.info;
+            if (scope && scope.state) state = scope.state;
+            if (scope && scope.position) position = scope.position;
+            if (global.evilEyeTestTools && !context && evilEyeTestTools.session.keyId) {
+                return new Promise((resolve, reject) => {
+                    const keyId = evilEyeTestTools.session.keyId;
+                    evilEyeTestTools.authFn(keyId, (err, secretKey) => {
+                        if (err) return reject(err);
+                        resolve({ keyId, secretKey });
+                    })
+                })
+                    .then(({ keyId, secretKey }) => {
+                        if (!secretKey) throw new Error('No such key.');
+                        if (secretKey !== evilEyeTestTools.session.secretKey) {
+                            throw new Error('Hash does not match.');
+                        }
+                        return queryFn(props, {
+                            obj,
+                            context: { sessionKeyId: keyId },
+                            info,
+                            state: typeof state !== 'undefined' ? state : this.lagan.state,
+                            position
+                        });
+                    });
+            }
             return queryFn(props, {
                 obj,
                 context,
                 info,
-                state: typeof state !== 'undefined' ? state : this.state,
+                state: typeof state !== 'undefined' ? state : this.lagan.state,
                 position
             });
         }
+
         resolverFn._evileye = { graphQlReturnType: returnType };
         const typeDefArgs = Object.keys(propsDefinition).length === 0 ? '' : '(' + Object.keys(propsDefinition).map(key => '  ' + key + ': ' + propsDefinition[key]).join('\n') + ')';
         const typeDef = 'extend type Query {\n' + queryName + ' ' + typeDefArgs + ': ' + returnType + '}';

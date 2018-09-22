@@ -113,6 +113,14 @@ class EvilEye {
 
     }
 
+    authFn(...args) {
+        // TODO:
+        // Not pretty to have this here.
+        // It only exists here for exposing the authFn to the testtools.
+        // Not part of public api.
+        this._server.authFn(...args);
+    }
+
     get command() {
         return this._graphql.command;
     }

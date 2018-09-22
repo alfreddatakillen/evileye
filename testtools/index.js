@@ -1,8 +1,24 @@
 const app = require('../index');
 
+let sessionKeyId, sessionSecretKey;
+
+global.evilEyeTestTools = {
+	authFn(...args) {
+		app.authFn(...args);
+	},
+	get session() {
+		return {
+			get keyId() { return sessionKeyId; },
+			get secretKey() { return sessionSecretKey; }
+		};
+	}
+};
+
 function given(precondition) {
 
 	const promise = app.restart(Array.isArray(precondition) ? {} : precondition);
+	sessionKeyId = '';
+	sessionSecretKey = '';
 
 	return {
 		when: behaviourFn => {
@@ -22,7 +38,12 @@ function given(precondition) {
 									if (typeof fn !== 'function') {
 										throw new Error('Precondition array must only contain functions.');
 									}
-									promise = promise.then(fn);
+									promise = promise.then(fn).then(result => {
+										if (typeof result === 'object' && typeof result.keyId === 'string' && typeof result.secretKey === 'string') {
+											sessionKeyId = result.keyId;
+											sessionSecretKey = result.secretKey;
+										}
+									});
 								});
 							}
 							firstResolve();
@@ -38,16 +59,16 @@ function given(precondition) {
 						})
 						.then(behaviourFn)
 						.catch(err => err)
-						.then(response => {
+						.then(result => {
 							let error = null;
-							if (response instanceof Error) {
-								error = response;
-								response = null;
+							if (result instanceof Error) {
+								error = result;
+								result = null;
 							}
 							app.closeEventStream();
 							return testFn({
 								error,
-								response,
+								result,
 								state: app.state
 							});
 						});
