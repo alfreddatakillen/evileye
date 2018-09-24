@@ -9,6 +9,13 @@ class EvilEye {
 
     constructor(opts = {}) {
 
+        const evilEye = this;
+        this.AppError = function (msg) {
+            Error.call(this, msg);
+            evilEye._log.silly('New application error object instantiated.', { errorMessage: msg });
+        }
+        this.AppError.prototype = Error;
+
         this._authFns = [];
 
         this._opts = opts;
