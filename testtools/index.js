@@ -65,12 +65,32 @@ function given(precondition) {
 								error = result;
 								result = null;
 							}
-							app.closeEventStream();
-							return testFn({
-								error,
-								result,
-								state: app.state
-							});
+							let testResult;
+							try {
+								testResult = testFn({
+									error,
+									result,
+									state: app.state
+								});
+							} catch (err) {
+								app.closeEventStream();
+								throw err;
+							}
+							if (typeof testResult === 'object' && typeof testResult.then === 'function') {
+								return testResult
+									.then(() => {
+										// cleanup
+										app.closeEventStream();
+									})
+									.catch(err => {
+										// cleanup
+										app.closeEventStream();
+										throw err;
+									});
+							} else {
+								app.closeEventStream();
+								return testResult;
+							}
 						});
 
 				}
