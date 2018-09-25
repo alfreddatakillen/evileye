@@ -86,6 +86,34 @@ class GraphQL {
             if (scope && scope.obj) obj = scope.obj;
             if (scope && scope.context) context = scope.context;
             if (scope && scope.info) info = scope.info;
+
+            if (global.evilEyeTestTools && !context && evilEyeTestTools.session.keyId) {
+                return new Promise((resolve, reject) => {
+                    const keyId = evilEyeTestTools.session.keyId;
+                    evilEyeTestTools.authFn(keyId, (err, secretKey) => {
+                        if (err) return reject(err);
+                        resolve({ keyId, secretKey });
+                    })
+                })
+                    .then(({ keyId, secretKey }) => {
+                        if (!secretKey) throw new Error('No such key.');
+                        if (secretKey !== evilEyeTestTools.session.secretKey) {
+                            throw new Error('Hash does not match.');
+                        }
+
+                        const context = { sessionKeyId: keyId };
+
+                        return new (EventClass)(props).apply(context)
+                            .then(({ state, position, props }) => {
+                                if (typeof response === 'function') {
+                                    return response(props, { obj, context, info, state, position })
+                                }
+                                return { position };
+                            });
+                    });
+            }
+
+
             return new (EventClass)(props).apply(context)
                 .then(({ state, position, props }) => {
                     if (typeof response === 'function') {
