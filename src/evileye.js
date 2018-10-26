@@ -140,6 +140,10 @@ class EvilEye {
         return this._graphql.addTypeDefs(...args);
     }
 
+    all(...args) {
+        this._server.all(...args);
+    }
+
     close() {
         this.closeEventStream();
         this._server.close();
@@ -157,8 +161,24 @@ class EvilEye {
         return this._graphql.createQuery(...args);
     }
 
+    delete(...args) {
+        this._server.delete(...args);
+    }
+
+    get(...args) {
+        this._server.get(...args);
+    }
+
     listen(...args) {
         return this._server.listen();
+    }
+
+    post(...args) {
+        this._server.post(...args);
+    }
+
+    put(...args) {
+        this._server.put(...args);
     }
 
     registerAuthFn(fn) {
@@ -170,6 +190,10 @@ class EvilEye {
 
     staticHtdocs(directory) {
         this._server.staticHtdocsDir = directory;
+    }
+
+    use(...args) {
+        this._server.use(...args);
     }
 
     get query() {

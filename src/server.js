@@ -21,6 +21,49 @@ class Server {
 		this.log = opts.log;
 		this.server = null;
 		this.staticHtdocsDir = null;
+		this.handlers = [];
+	}
+
+	all(...args) {
+		this.handlers.push({
+			method: 'ALL',
+			args
+		});
+	}
+
+	delete(...args) {
+		this.handlers.push({
+			method: 'DELETE',
+			args
+		});
+	}
+
+	get(...args) {
+		this.handlers.push({
+			method: 'GET',
+			args
+		});
+	}
+
+	post(...args) {
+		this.handlers.push({
+			method: 'POST',
+			args
+		});
+	}
+
+	put(...args) {
+		this.handlers.push({
+			method: 'PUT',
+			args
+		});
+	}
+
+	use(...args) {
+		this.handlers.push({
+			method: 'USE',
+			args
+		});
 	}
 
 	authFn(keyId, callback) {
@@ -114,6 +157,15 @@ class Server {
 	
 		const graphiqlDir = this.configuration.basedir + '/node_modules/graphiql-sessionist/build';
 		app.use('/graphiql', express.static(graphiqlDir));
+
+		this.handlers.forEach(handler => {
+			if (handler.method === 'ALL') app.all(...handler.args);
+			if (handler.method === 'DELETE') app.delete(...handler.args);
+			if (handler.method === 'GET') app.get(...handler.args);
+			if (handler.method === 'POST') app.post(...handler.args);
+			if (handler.method === 'PUT') app.put(...handler.args);
+			if (handler.method === 'USE') app.use(...handler.args);
+		});
 
 		if (this.staticHtdocsDir) {
 			app.use('/', express.static(this.staticHtdocsDir));
