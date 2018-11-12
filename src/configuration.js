@@ -9,7 +9,8 @@ class Configuration {
         // If the global function "it" exists, then we are running tests.
         const stage = opts.stage || (typeof global.it === 'function' ? 'test' : (envcnf.get('NODE_ENV') || 'development'));
         
-        const basedir = opts.basedir || (stage === 'test' ? path.dirname(path.dirname(path.dirname(path.dirname(process.argv[1])))) : path.dirname(process.argv[1]));
+        // const basedir = opts.basedir || (stage === 'test' ? path.dirname(path.dirname(path.dirname(path.dirname(process.argv[1])))) : path.dirname(process.argv[1]));
+        const basedir = process.cwd();
         
         let name, version;
         try {
