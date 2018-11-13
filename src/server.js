@@ -1,4 +1,6 @@
 const express = require('express');
+const cors = require('cors');
+
 const GraphQL = require('./graphql');
 
 const sessionistHeader = require('sessionistheader');
@@ -15,6 +17,7 @@ class Server {
 		}
 		
 		this.configuration = opts.configuration;
+		this.corsDomains = [];
 		this.auth = opts.auth;
 		this.graphql = opts.graphql;
 		this.lagan = opts.lagan;
@@ -99,11 +102,36 @@ class Server {
 		});
 	}
 
+	cors(domains) {
+		if (typeof domains === 'undefined') {
+			this.corsDomains.length = 0;
+			this.corsDomains.push('*');
+		}
+		if (this.corsDomains.length > 0 && this.corsDomains[0] === '*') return;
+
+		if (!Array.isArray(domains)) domains = [ domains ];
+		domains.forEach(domain => this.corsDomains.push(domain));
+	}
+
 	listen() {
 
 		 // Create an express server and a GraphQL endpoint
 		const app = express();
 		this.app = app;
+
+		if (this.corsDomains.length > 0) {
+			app.use(cors({
+				origin: (origin, callback) => {
+					if (this.corsDomains.indexOf('*') !== -1) {
+						return callback(null, true);
+					}
+					if (this.corsDomains.indexOf(origin) !== -1) {
+						return callback(null, true);
+					}
+					callback(new Error('Domain not allowed by CORS: ' + origin));
+				}
+			}));
+		}
 
 		app.use((req, res, next) => {
 			req.rawBody = Buffer.from('');
