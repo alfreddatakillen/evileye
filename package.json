@@ -26,6 +26,7 @@
     "testdouble": "^3.8.1"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "disposablefile": "^1.1.0",
     "envcnf": "^1.0.1",
     "express": "^4.16.3",

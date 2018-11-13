@@ -153,6 +153,10 @@ class EvilEye {
         this._lagan.close();
     }
 
+    cors(domains) {
+        return this._server.cors(domains);
+    }
+
     createCommand(...args) {
         return this._graphql.createCommand(...args);
     }
