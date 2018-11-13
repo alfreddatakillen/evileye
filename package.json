@@ -1,6 +1,6 @@
 {
   "name": "evileye",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "Node.js framework for event sourced web backend with GraphQL interface.",
   "main": "index.js",
   "directories": {
