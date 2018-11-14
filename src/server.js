@@ -23,7 +23,12 @@ class Server {
 		this.lagan = opts.lagan;
 		this.log = opts.log;
 		this.server = null;
-		this.staticHtdocsDir = null;
+
+		const graphiqlDir = this.configuration.basedir + '/node_modules/graphiql-sessionist/build';
+		this.staticHtdocsDirs = [
+			{ '/graphiql': graphiqlDir }
+		];
+
 		this.handlers = [];
 	}
 
@@ -183,8 +188,17 @@ class Server {
 	
 		app.use('/graphql', this.graphql.middleware());
 	
-		const graphiqlDir = this.configuration.basedir + '/node_modules/graphiql-sessionist/build';
-		app.use('/graphiql', express.static(graphiqlDir));
+		this.staticHtdocsDirs.forEach(dir => {
+			if (typeof dir === 'string') {
+				app.use('/', express.static(dir));
+			} else if (typeof dir === 'object') {
+				Object.keys(dir).forEach(path => {
+					if (typeof path === 'string' && typeof dir[path] === 'string') {
+						app.use(path, express.static(dir[path]));
+					}
+				});
+			}
+		})
 
 		this.handlers.forEach(handler => {
 			if (handler.method === 'ALL') app.all(...handler.args);
@@ -194,10 +208,6 @@ class Server {
 			if (handler.method === 'PUT') app.put(...handler.args);
 			if (handler.method === 'USE') app.use(...handler.args);
 		});
-
-		if (this.staticHtdocsDir) {
-			app.use('/', express.static(this.staticHtdocsDir));
-		}
 
 		return new Promise((resolve, reject) => resolve())
 			.then(() => {
@@ -216,6 +226,15 @@ class Server {
 			
 	}
 	
+	staticHtdocs(dir) {
+		if (Array.isArray(dir)) {
+			dir.forEach(dir => {
+				this.staticHtdocsDirs.push(dir);
+			});
+		} else {
+			this.staticHtdocsDirs.push(dir);
+		}
+	}
 
 }
 

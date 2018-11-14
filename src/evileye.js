@@ -193,7 +193,7 @@ class EvilEye {
     }
 
     staticHtdocs(directory) {
-        this._server.staticHtdocsDir = directory;
+        this._server.staticHtdocs(directory);
     }
 
     use(...args) {
