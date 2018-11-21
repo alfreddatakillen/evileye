@@ -165,12 +165,24 @@ class EvilEye {
         return this._graphql.createQuery(...args);
     }
 
+    debug(...args) {
+        this._log.debug(...args);
+    }
+
     delete(...args) {
         this._server.delete(...args);
     }
 
+    error(...args) {
+        this._log.error(...args);
+    }
+
     get(...args) {
         this._server.get(...args);
+    }
+
+    info(...args) {
+        this._log.info(...args);
     }
 
     listen(...args) {
@@ -192,12 +204,24 @@ class EvilEye {
         this._authFns = [ ...(this._authFns), fn ];
     }
 
+    silly(...args) {
+        this._log.silly(...args);
+    }
+
     staticHtdocs(directory) {
         this._server.staticHtdocs(directory);
     }
 
     use(...args) {
         this._server.use(...args);
+    }
+
+    verbose(...args) {
+        this._log.verbose(...args);
+    }
+
+    warn(...args) {
+        this._log.warn(...args);
     }
 
     get query() {
