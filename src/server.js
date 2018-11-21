@@ -186,19 +186,22 @@ class Server {
 			}
 		});
 	
+		this.log && this.log.verbose('Hosting graphql interface at /graphql');
 		app.use('/graphql', this.graphql.middleware());
 	
 		this.staticHtdocsDirs.forEach(dir => {
 			if (typeof dir === 'string') {
 				app.use('/', express.static(dir));
+				this.log && this.log.verbose('Hosting files from static dir.', { httppath: '/', fsdir: dir });
 			} else if (typeof dir === 'object') {
 				Object.keys(dir).forEach(path => {
 					if (typeof path === 'string' && typeof dir[path] === 'string') {
 						app.use(path, express.static(dir[path]));
+						this.log && this.log.verbose('Hosting files from static dir.', { httppath: path, fsdir: dir[path] });
 					}
 				});
 			}
-		})
+		});
 
 		this.handlers.forEach(handler => {
 			if (handler.method === 'ALL') app.all(...handler.args);
