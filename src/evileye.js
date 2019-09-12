@@ -25,22 +25,25 @@ class EvilEye {
             port: opts.port
         });
         
-        this._lagan = new Lagan({
+		this._log = new Log({
+            configuration: this._configuration
+        })
+
+		this._log.silly(this._log.messages.initializingLagan);
+		this._lagan = new Lagan({
             initialState: opts.initialState || {},
             logFile: this._configuration.eventLogFile
         });
         this.Event = this._lagan.Event;
 
-        this._log = new Log({
-            configuration: this._configuration
-        })
-
-	this._graphql = new GraphQL({
+		this._log.silly(this._log.messages.initializingGraphQL);
+		this._graphql = new GraphQL({
             configuration: this._configuration,
             lagan: this._lagan,
             log: this._log
         });
 
+		this._log.silly(this._log.messages.initializingServer);
         this._server = new Server({
             configuration: this._configuration,
             graphql: this._graphql,

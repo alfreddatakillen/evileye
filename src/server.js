@@ -216,6 +216,7 @@ class Server {
 			.then(() => {
 				const port = this.configuration.port;
 				if (port) return port;
+				this.log && this.log.verbose(this.log.messages.tryingPorts);
 				return getPort({ port: [ 3000, 3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009, 4000, 4001, 4002, 4003, 4004, 4005, 4006, 4007, 4008, 4009 ] });
 			})
 			.then(port => {

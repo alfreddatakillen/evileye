@@ -13,12 +13,16 @@ const messages = {
 	eventProjectionFailed: 'Event projection failed.',
 	graphqlError: 'Error caught during GraphQL resolve.',
 	incomingHttpRequest: 'Incoming HTTP(S) request.',
+	initializingLagan: 'Initializing Lagan.',
+	initializingGraphQL: 'Initializing GraphQL.',
+	initializingServer: 'Initializing Server.',
 	invalidAuthorizationHeader: 'Invalid Sessionist authorization header.',
 	listenOnPort: 'Started listening on port.',
 	noAuth: 'No auth function in .listen(). Auth disabled.',
 	noSlackWebhookConfig: 'No environment variable set for the Slack webhook. Slack alerts/notifications/logging disabled.',
 	startedLogging: 'Started process.',
-	stoppedLogging: 'Stopped process.'
+	stoppedLogging: 'Stopped process.',
+	tryingPorts: 'Trying to find an available TCP port.'
 };
 
 class Log {
