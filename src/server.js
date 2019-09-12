@@ -124,6 +124,12 @@ class Server {
 		const app = express();
 		this.app = app;
 
+		app.disable('x-powered-by');
+		app.use((req, res, next) => {
+			res.setHeader('X-Server-Epoch', Math.round(new Date().getTime() / 1000));
+			next();
+		});
+
 		if (this.corsDomains.length > 0) {
 			app.use(cors({
 				origin: (origin, callback) => {
