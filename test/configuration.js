@@ -1,5 +1,5 @@
 const Configuration = require('../src/configuration');
-const disposableFile = require('disposableFile');
+const disposableFile = require('disposablefile');
 const envcnf = require('envcnf');
 const expect = require('chai').expect;
 const path = require('path');
