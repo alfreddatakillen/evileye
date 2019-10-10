@@ -13,16 +13,12 @@ const messages = {
 	eventProjectionFailed: 'Event projection failed.',
 	graphqlError: 'Error caught during GraphQL resolve.',
 	incomingHttpRequest: 'Incoming HTTP(S) request.',
-	initializingLagan: 'Initializing Lagan.',
-	initializingGraphQL: 'Initializing GraphQL.',
-	initializingServer: 'Initializing Server.',
 	invalidAuthorizationHeader: 'Invalid Sessionist authorization header.',
 	listenOnPort: 'Started listening on port.',
 	noAuth: 'No auth function in .listen(). Auth disabled.',
 	noSlackWebhookConfig: 'No environment variable set for the Slack webhook. Slack alerts/notifications/logging disabled.',
 	startedLogging: 'Started process.',
-	stoppedLogging: 'Stopped process.',
-	tryingPorts: 'Trying to find an available TCP port.'
+	stoppedLogging: 'Stopped process.'
 };
 
 class Log {
@@ -43,6 +39,19 @@ class Log {
 		];
 		if (configuration.stage !== 'test') {
 			transports.push(new winston.transports.Console({ format: winston.format.combine(winston.format.colorize({ all: true }), winston.format.simple()), level: configuration.consoleLogLevel, timestamp: true }))
+
+			transports.push(new winston.transports.Console({ format: (winston.format((info, opts) => {
+				if (info.stack) {
+					console.log(
+						info.stack
+							.split("\n")
+							.map((row, index) => (index === 0 ? "\x1b[1m\x1b[33m" : "\x1b[37m") + "\x1b[41m" + row + "\x1b[0m")
+							.join("\n")
+					);
+				}
+				return false;
+			}))(), level: 'error', timestamp: true }))
+
 			if (!configuration.slackWebhook) {
 				setImmediate(() => this.warn(messages.noSlackWebhookConfig));
 			} else {

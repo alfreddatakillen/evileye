@@ -194,7 +194,7 @@ class GraphQL {
                 this.log.error(this.log.messages.graphqlError, {
                     errorMessage: error.message,
                     locations: error.locations,
-                    stack: error.stack ? error.stack.split('\n') : [],
+                    stack: error.stack,
                     path: error.path
                   });
                 return formatError(error);
